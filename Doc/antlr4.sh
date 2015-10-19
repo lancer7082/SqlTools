@@ -1,0 +1,1 @@
+java -cp ".:/e/Projects/dotNet/SqlTools/Doc/antlr-4.5.1-complete.jar" org.antlr.v4.Tool
