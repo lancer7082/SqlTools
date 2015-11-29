@@ -1,0 +1,11 @@
+USE [Test]
+GO
+
+ALTER PROCEDURE [dbo].[Test]
+AS
+BEGIN
+  BEGIN
+    SELECT '1'
+  END  
+END  
+;

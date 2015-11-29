@@ -1,1 +1,0 @@
-java -jar antlrworks-1.5.2-complete.jar
