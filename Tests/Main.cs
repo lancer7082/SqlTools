@@ -35,7 +35,9 @@ namespace Tests
 @"USE [Test]
 GO
 
-ALTER PROCEDURE[dbo].[Test]
+ALTER PROCEDURE [dbo].[Test]
+    @Param1 INT,
+    @Param2 INT
 AS
 BEGIN
   BEGIN

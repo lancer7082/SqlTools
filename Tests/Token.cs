@@ -3,11 +3,27 @@
 namespace SqlTools.Common
 {
     public enum TokenTypes {
-        OPEN_PARENTHESIS = 0,   //(
-        CLOSE_PARENTHESIS,      //)
-        BEGIN_BLOCK,            //{
-        END_BLOCK               //{
-        //KEYWORD = 0, IDENTIFIER, DELIMITER, NEWLINE
+        //Symbols
+        OPEN_BRACKET = 0,       //(
+        CLOSE_BRACKET,          //)
+        OPEN_SQUARE_BRACE,      //[
+        CLOSE_SQUARE_BRACE,     //]
+        DOT,                    //.
+        SEMICOLON,              //;
+        //Keywords
+        USE,
+        GO,
+        BEGIN,                  
+        END,                    
+        CREATE,
+        ALTER,
+        PROCEDURE,
+        FUNCTION,
+        AS,
+        EXEC,
+        //
+        IDENTIFIER,             //ID        
+        DELIMITER               //,
     }
     public class Token
     {
