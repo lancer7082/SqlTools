@@ -25,26 +25,97 @@ namespace SqlTools.Common
             };
         }
 
+        /// <summary>
+        /// Строка
+        /// </summary>
+        /// <returns></returns>
+        private Token ParseStringConstant()
+        {
+            if (reader.Peek() != -1 && (char)reader.Peek() == '\'')
+            {
+                reader.Read();
+                var sb = new StringBuilder();
+                while (reader.Peek() != -1)
+                {
+                    if ((char)reader.Peek() == '\'')
+                    {
+                        reader.Read();
+                        if ((char)reader.Peek() != '\'') return new Token { Type = TokenTypes.STRING, Value = sb.ToString() };
+                    }
+                    sb.Append((char)reader.Read());
+                }
+            }
+            throw new ApplicationException("Syntax error");
+        }
+
+        private Token ParseSlashOrComment()
+        {
+            if (reader.Peek() != -1 && (char)reader.Peek() == '/')
+            {
+                var c = (char)reader.Read();
+                if (reader.Peek() != -1)
+                {
+                    if ((char)reader.Peek() == '*')   // /*
+                    {
+                        //search for end of comment
+                        var sb = new StringBuilder();
+                        while (reader.Peek() != -1)
+                        {
+                            if ((char)reader.Peek() == '*')
+                            {
+                                reader.Read();
+                                if ((char)reader.Peek() == '/') return new Token { Type = TokenTypes.COMMENT, Value = sb.ToString() };
+                            }
+                            sb.Append((char)reader.Read());
+                        }
+                    }
+                    else
+                    {
+                        return new Token { Type = TokenTypes.DELIMITER, Value = c.ToString() };
+                    }
+                }
+            }
+            throw new ApplicationException("Syntax error");
+        }
+
+        private Token ParseMinusOrComment()
+        {
+            return null;
+        }
+
         public Token Next()
         {
             PassWhiteSpace();
             if (reader.Peek() != -1)
             {
+                //Token token;
                 var c = (char)reader.Peek();
                 switch (c)
                 {
                     case '(':
+                        reader.Read();
                         return new Token { Type = TokenTypes.OPEN_BRACKET };
                     case ')':
+                        reader.Read();
                         return new Token { Type = TokenTypes.CLOSE_BRACKET };
                     case '[':
-                        return new Token { Type = TokenTypes.OPEN_SQUARE_BRACE };
+                        reader.Read();
+                        return new Token { Type = TokenTypes.SQUARE_BRACE_OPEN };
                     case ']':
-                        return new Token { Type = TokenTypes.CLOSE_SQUARE_BRACE };
+                        reader.Read();
+                        return new Token { Type = TokenTypes.SQUARE_BRACE_CLOSE };
                     case '.':
-                        return new Token { Type = TokenTypes.DOT};
+                        reader.Read();
+                        return new Token { Type = TokenTypes.DOT };
                     case ';':
+                        reader.Read();
                         return new Token { Type = TokenTypes.SEMICOLON };
+                    case '\'':
+                        return ParseStringConstant();
+                    case '-':
+                        return ParseMinusOrComment();
+                    case '/':
+                        return ParseSlashOrComment();
                     default:
                         if (Char.IsLetter(c))
                         {
@@ -55,7 +126,7 @@ namespace SqlTools.Common
                             }
 
                             var token = sb.ToString();
-                            switch(token.ToUpper())
+                            switch (token.ToUpper())
                             {
                                 case "USE":
                                     return new Token { Type = TokenTypes.USE };
@@ -77,20 +148,25 @@ namespace SqlTools.Common
                                     return new Token { Type = TokenTypes.AS };
                                 case "EXEC":
                                     return new Token { Type = TokenTypes.EXEC };
-                                default
+                                default:
                                     //TODO
-                                    return null;
+                                    return new Token { Type = TokenTypes.IDENTIFIER, Value = token };
                             }
                         }
-                        break;
+                        else
+                        {
+                            reader.Read();
+                            return new Token { Type = TokenTypes.DELIMITER, Value = c.ToString() };
+                        }
+                        //break;              
                 }
             }
             return null;
         }
 
-        public Token LookAhead()
-        {
-            return null;
-        }
+        //public Token LookAhead()
+        //{
+        //    return null;
+        //}
     }
 }

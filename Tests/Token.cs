@@ -6,10 +6,11 @@ namespace SqlTools.Common
         //Symbols
         OPEN_BRACKET = 0,       //(
         CLOSE_BRACKET,          //)
-        OPEN_SQUARE_BRACE,      //[
-        CLOSE_SQUARE_BRACE,     //]
+        SQUARE_BRACE_OPEN,      //[
+        SQUARE_BRACE_CLOSE,     //]
         DOT,                    //.
         SEMICOLON,              //;
+        SINGLE_QUOTE,           //'
         //Keywords
         USE,
         GO,
@@ -23,7 +24,9 @@ namespace SqlTools.Common
         EXEC,
         //
         IDENTIFIER,             //ID        
-        DELIMITER               //,
+        DELIMITER,              //,
+        STRING,
+        COMMENT
     }
     public class Token
     {

@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.IO;
+using SqlTools.Common;
 
 namespace Tests
 {
@@ -31,7 +32,7 @@ namespace Tests
         [TestMethod]
         public void TestParse()
         {
-            string test = 
+            string text = 
 @"USE [Test]
 GO
 
@@ -45,7 +46,28 @@ BEGIN
   END
 END
 ;";
+            var parser = new SqlParser(text);
+            parser.Parse();
+        }
 
+        [TestMethod]
+        public void TestParseStringConstant()
+        {
+            string text =
+@"/*
+asdsad
+sads
+sdsd
+*/
+ALTER PROCEDURE Test
+AS
+BEGIN
+  '''''asd''''
+GO'
+END
+GO";
+            var parser = new SqlParser(text);
+            parser.Parse();
         }
     }
 }
