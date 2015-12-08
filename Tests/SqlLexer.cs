@@ -8,8 +8,6 @@ namespace SqlTools.Common
     {
         private readonly string text;
         private StringReader reader;
-        //public readonly char[] aWhiteSpace = { ' ', '\t' };
-        //public readonly char[] aNewLine = { '\n', '\r' };
 
         public SqlLexer(string text)
         {
@@ -17,6 +15,9 @@ namespace SqlTools.Common
             reader = new StringReader(text);
         }    
         
+        /// <summary>
+        /// Пропуск пробелов
+        /// </summary>
         private void PassWhiteSpace()
         {
             while (Char.IsWhiteSpace((char)reader.Peek())) 
@@ -48,6 +49,10 @@ namespace SqlTools.Common
             throw new ApplicationException("Syntax error");
         }
 
+        /// <summary>
+        /// Многострочный комментарий или "/"
+        /// </summary>
+        /// <returns></returns>
         private Token ParseSlashOrComment()
         {
             if (reader.Peek() != -1 && (char)reader.Peek() == '/')
@@ -57,20 +62,26 @@ namespace SqlTools.Common
                 {
                     if ((char)reader.Peek() == '*')   // /*
                     {
-                        //search for end of comment
+                        reader.Read();
+                        //search for the end of comment
                         var sb = new StringBuilder();
                         while (reader.Peek() != -1)
                         {
                             if ((char)reader.Peek() == '*')
                             {
                                 reader.Read();
-                                if ((char)reader.Peek() == '/') return new Token { Type = TokenTypes.COMMENT, Value = sb.ToString() };
+                                if ((char)reader.Peek() == '/')
+                                {
+                                    reader.Read();
+                                    return new Token { Type = TokenTypes.COMMENT, Value = sb.ToString() };
+                                }
                             }
                             sb.Append((char)reader.Read());
                         }
                     }
                     else
                     {
+                        reader.Read();
                         return new Token { Type = TokenTypes.DELIMITER, Value = c.ToString() };
                     }
                 }
@@ -78,9 +89,39 @@ namespace SqlTools.Common
             throw new ApplicationException("Syntax error");
         }
 
+        /// <summary>
+        /// Однострочный комментарий или "-"
+        /// </summary>
+        /// <returns></returns>
         private Token ParseMinusOrComment()
         {
-            return null;
+            if (reader.Peek() != -1 && (char)reader.Peek() == '-')
+            {
+                var c = (char)reader.Read();
+                if (reader.Peek() != -1)
+                {
+                    if ((char)reader.Peek() == '-')   // --
+                    {
+                        reader.Read();
+                        //search for the end of line
+                        var sb = new StringBuilder();
+                        while (reader.Peek() != -1)
+                        {
+                            if ((char)reader.Peek() == '\r')
+                            {
+                                return new Token { Type = TokenTypes.COMMENT, Value = sb.ToString() };
+                            }
+                            sb.Append((char)reader.Read());
+                        }
+                    }
+                    else
+                    {
+                        reader.Read();
+                        return new Token { Type = TokenTypes.DELIMITER, Value = c.ToString() };
+                    }
+                }
+            }
+            throw new ApplicationException("Syntax error");
         }
 
         public Token Next()

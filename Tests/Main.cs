@@ -13,7 +13,7 @@ namespace Tests
         {
             string fileName = @"..\..\..\Doc\test.sql";
 
-            string text = System.IO.File.ReadAllText(fileName);
+            string text = File.ReadAllText(fileName);
 
             //using (var reader = new StreamReader(fileName))
             //{
@@ -68,6 +68,44 @@ END
 GO";
             var parser = new SqlParser(text);
             parser.Parse();
+        }
+
+        [TestMethod]
+        public void TestParseComment()
+        {
+            string text =
+@"/*
+asdsad
+sads
+sdsd
+*/
+USE asdas
+-- adasd
+GO";
+            var lexer = new SqlLexer(text);
+            Token token;
+            //bool isValid = false;
+            while ((token = lexer.Next()) != null)
+            {
+                Console.WriteLine(token.Type.ToString());
+            };
+        }
+
+        [TestMethod]
+        public void TestMergeStatement()
+        {
+            string text =
+@";MERGE assds
+USING asdasd ON dsad
+WHEN MATCHED THEN adsad
+;";
+            var lexer = new SqlLexer(text);
+            Token token;
+            //bool isValid = false;
+            while ((token = lexer.Next()) != null)
+            {
+                Console.WriteLine(token.Type.ToString());
+            };
         }
     }
 }
