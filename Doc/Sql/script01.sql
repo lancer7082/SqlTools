@@ -1,0 +1,40 @@
+USE [Test]
+GO
+ 
+--DROP PROCEDURE [dbo].[Proc1]
+
+IF OBJECT_ID('[dbo].[Proc01]') IS NULL
+	EXEC ('CREATE PROCEDURE [dbo].[Proc01] AS BEGIN RETURN END')
+GO
+
+-- Proc01
+-- 111
+
+/*
+ads
+*/
+ALTER PROCEDURE [dbo].[Proc01] 
+	@Param1 INT,
+	@Param2 CHAR = NULL
+AS 
+BEGIN 
+	RETURN 
+END
+GO
+
+GRANT EXEC ON [dbo].[Proc01] TO [login01]
+--GO
+
+IF OBJECT_ID('[dbo].[Proc02]') IS NULL
+	EXEC ('CREATE PROCEDURE [dbo].[Proc02] AS BEGIN RETURN END')
+GO
+
+/* Proc02
+222
+*/
+ALTER PROCEDURE [dbo].[Proc02] 
+AS 
+BEGIN 
+	RETURN 
+END
+GO
