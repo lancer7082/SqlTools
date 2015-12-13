@@ -22,7 +22,12 @@ namespace SqlTools.Common
         FUNCTION,
         AS,
         EXEC,
+        GRANT,
+        ON,
+        TO,
         //
+        //OBJECT,                 //Procedure of function
+        //SCRIPT,                 //Other
         IDENTIFIER,             //ID        
         DELIMITER,              //,
         STRING,

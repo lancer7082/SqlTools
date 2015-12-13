@@ -7,12 +7,13 @@ namespace SqlTools.Common
     public class SqlLexer
     {
         private readonly string text;
-        private StringReader reader;
+        //private StringReader reader;
+        private StreamReader reader;
 
         public SqlLexer(string text)
         {
             this.text = text;
-            reader = new StringReader(text);
+            reader = new StreamReader(new MemoryStream(Encoding.ASCII.GetBytes(text)));
         }    
         
         /// <summary>
@@ -135,22 +136,22 @@ namespace SqlTools.Common
                 {
                     case '(':
                         reader.Read();
-                        return new Token { Type = TokenTypes.OPEN_BRACKET };
+                        return new Token { Type = TokenTypes.OPEN_BRACKET, Value = c.ToString() };
                     case ')':
                         reader.Read();
-                        return new Token { Type = TokenTypes.CLOSE_BRACKET };
+                        return new Token { Type = TokenTypes.CLOSE_BRACKET, Value = c.ToString() };
                     case '[':
                         reader.Read();
-                        return new Token { Type = TokenTypes.SQUARE_BRACE_OPEN };
+                        return new Token { Type = TokenTypes.SQUARE_BRACE_OPEN, Value = c.ToString() };
                     case ']':
                         reader.Read();
-                        return new Token { Type = TokenTypes.SQUARE_BRACE_CLOSE };
+                        return new Token { Type = TokenTypes.SQUARE_BRACE_CLOSE, Value = c.ToString() };
                     case '.':
                         reader.Read();
-                        return new Token { Type = TokenTypes.DOT };
+                        return new Token { Type = TokenTypes.DOT, Value = c.ToString() };
                     case ';':
                         reader.Read();
-                        return new Token { Type = TokenTypes.SEMICOLON };
+                        return new Token { Type = TokenTypes.SEMICOLON, Value = c.ToString() };
                     case '\'':
                         return ParseStringConstant();
                     case '-':
@@ -189,8 +190,13 @@ namespace SqlTools.Common
                                     return new Token { Type = TokenTypes.AS };
                                 case "EXEC":
                                     return new Token { Type = TokenTypes.EXEC };
+                                case "GRANT":
+                                    return new Token { Type = TokenTypes.GRANT };
+                                case "ON":
+                                    return new Token { Type = TokenTypes.ON };
+                                case "TO":
+                                    return new Token { Type = TokenTypes.TO };
                                 default:
-                                    //TODO
                                     return new Token { Type = TokenTypes.IDENTIFIER, Value = token };
                             }
                         }
@@ -199,15 +205,17 @@ namespace SqlTools.Common
                             reader.Read();
                             return new Token { Type = TokenTypes.DELIMITER, Value = c.ToString() };
                         }
-                        //break;              
                 }
             }
             return null;
         }
 
-        //public Token LookAhead()
-        //{
-        //    return null;
-        //}
+        public Token LookAhead()
+        {
+            var pos = reader.BaseStream.Position;
+            var token = Next();
+            reader.BaseStream.Seek(pos, SeekOrigin.Begin);
+            return token;
+        }
     }
 }

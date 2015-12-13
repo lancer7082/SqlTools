@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Collections.Generic;
 
 namespace SqlTools.Common
@@ -6,13 +7,15 @@ namespace SqlTools.Common
     public class SqlParser
     {
         private SqlLexer lexer;
-        private Token currentToken;
+        //private Token currentToken;
+        private List<Token> comments;
         
         public List<string> Objects { get; set; }
 
         public SqlParser(string text)
         {
             lexer = new SqlLexer(text);
+            comments = new List<Token>();
         }
 
         public void Parse()
@@ -25,20 +28,134 @@ namespace SqlTools.Common
         /// </summary>
         private bool StatementBase()
         {
-            //System.Console.WriteLine("StatementBase: %s", currentToken.Type);
-            //seek end of batch
+            ////System.Console.WriteLine("StatementBase: %s", currentToken.Type);
+            ////seek end of batch
+            //Token token;
+            ////bool isValid = false;
+            //while ((token = lexer.Next()) != null)
+            //{
+            //    if (token.Type == TokenTypes.GO ||
+            //        token.Type == TokenTypes.SEMICOLON)
+            //    {
+            //        return true;
+            //    }
+            //}
+            //throw new ApplicationException("End of batch not found");
+            return false;
+        }
+
+        /// <summary>
+        /// Поиск 1-го токена по типу
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        private bool SearchToken(TokenTypes type)
+        {
             Token token;
-            //bool isValid = false;
             while ((token = lexer.Next()) != null)
             {
-                if (token.Type == TokenTypes.GO ||
-                    token.Type == TokenTypes.SEMICOLON)
+                if (token.Type == type)
+                    return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Разбор процедуры
+        /// </summary>
+        /// <returns></returns>
+        private bool MatchProcedure()
+        {
+            string objectName = "";
+            if (MatchObjectName(ref objectName))
+            {
+                if (SearchToken(TokenTypes.AS))
                 {
+                    if (SearchToken(TokenTypes.GO))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false; 
+        }
+
+        /// <summary>
+        /// Разбор функции
+        /// </summary>
+        /// <returns></returns>
+        private bool MatchFunction()
+        {
+            string objectName = "";
+            if (MatchObjectName(ref objectName))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Название объекта БД (схема, таблица, поле и т.д.)
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        private bool MatchDatabaseIdentifier(ref string name)
+        {
+            Token token;
+            var sb = new StringBuilder();
+            if ((token = lexer.Next()) != null)
+            {
+                if (token.Type == TokenTypes.SQUARE_BRACE_OPEN)
+                {
+                    sb.Append(token.Value);
+                    if (((token = lexer.Next()) != null) && (token.Type == TokenTypes.IDENTIFIER))
+                    {
+                        sb.Append(token.Value);
+                        if (((token = lexer.Next()) != null) && (token.Type == TokenTypes.SQUARE_BRACE_CLOSE))
+                        {
+                            sb.Append(token.Value);
+                            name = sb.ToString();
+                            return true;
+                        }
+                    }
+                }
+                else if (token.Type == TokenTypes.IDENTIFIER)
+                {
+                    name = token.Value;
                     return true;
                 }
             }
-            throw new ApplicationException("End of batch not found");
-            //return true;
+            return false;
+        }
+
+        /// <summary>
+        /// Разбор названия объекта с учетом схемы
+        /// </summary>
+        /// <param name="objectName"></param>
+        /// <returns></returns>
+        private bool MatchObjectName(ref string objectName)
+        {
+            Token token;
+            string name = "";
+            if ((token = lexer.Next()) != null)
+            {
+                if (MatchDatabaseIdentifier(ref name))
+                {
+                    objectName = name;
+                    if (((token = lexer.LookAhead()) != null) && (token.Type == TokenTypes.DOT))
+                    {
+                        token = lexer.Next();
+                        if (MatchDatabaseIdentifier(ref name))
+                        {
+                            objectName += name;
+                            return true;
+                        }
+                    }
+                    else 
+                        return true;
+                }
+            }
+            return false;
         }
 
         /// <summary>
@@ -46,18 +163,37 @@ namespace SqlTools.Common
         /// </summary>
         private bool StatementAlterCreate()
         {
-            //System.Console.WriteLine("StatementAlterCreate: %s", currentToken.Type);
             Token token;
-            //bool isValid = false;
-            while ((token = lexer.Next()) != null)
+            if ((token = lexer.Next()) != null)
             {
-                if (token.Type == TokenTypes.GO ||
-                    token.Type == TokenTypes.SEMICOLON)
+                if (token.Type == TokenTypes.PROCEDURE)
                 {
-                    return true;
+                    if (MatchProcedure())
+                        return true;
+                }
+                else if (token.Type == TokenTypes.FUNCTION)
+                {
+                    if (MatchFunction())
+                        return true;
                 }
             }
-            throw new ApplicationException("End of batch not found");
+            return false;
+        }
+
+        /// <summary>
+        /// GRANT Permission ON Object TO Principal
+        /// </summary>
+        private bool MatchGrantPermission()
+        {
+            return false;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void PushComment()
+        {
+
         }
 
         /// <summary>
@@ -69,19 +205,29 @@ namespace SqlTools.Common
             var token = lexer.Next();
             if (token != null)
             {
-                currentToken = token;
+                //if ((token.Type != TokenTypes.COMMENT) && (token.Type != ))
+                //currentToken = token;
                 switch (token.Type)
                 {
-                    case TokenTypes.USE:
-                    case TokenTypes.EXEC:
-                        StatementBase();
-                        break;
                     case TokenTypes.ALTER:
                     case TokenTypes.CREATE:
                         StatementAlterCreate();
                         break;
-                    default:                      
-                        throw new ApplicationException("Syntax error");
+                    case TokenTypes.GRANT:
+                        MatchGrantPermission();
+                        break;
+                    case TokenTypes.COMMENT:
+                        PushComment();
+                        break;
+                    //case TokenTypes.USE:
+                    //case TokenTypes.EXEC:
+                    //    StatementBase();
+                    //    break;
+                    //default:                      
+                    //    throw new ApplicationException("Syntax error");
+                    default:
+                        StatementBase();
+                        break;
                 }
                 return true;
             }
