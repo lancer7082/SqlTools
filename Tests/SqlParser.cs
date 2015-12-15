@@ -28,19 +28,10 @@ namespace SqlTools.Common
         /// </summary>
         private bool StatementBase()
         {
-            ////System.Console.WriteLine("StatementBase: %s", currentToken.Type);
-            ////seek end of batch
-            //Token token;
-            ////bool isValid = false;
-            //while ((token = lexer.Next()) != null)
-            //{
-            //    if (token.Type == TokenTypes.GO ||
-            //        token.Type == TokenTypes.SEMICOLON)
-            //    {
-            //        return true;
-            //    }
-            //}
-            //throw new ApplicationException("End of batch not found");
+            if (SeekToken(TokenTypes.GO))
+            {
+                return true;
+            }
             return false;
         }
 
@@ -49,13 +40,18 @@ namespace SqlTools.Common
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        private bool SearchToken(TokenTypes type)
+        private bool SeekToken(TokenTypes type)
         {
             Token token;
             while ((token = lexer.Next()) != null)
             {
+ 
                 if (token.Type == type)
                     return true;
+                else if (token.Type == TokenTypes.ALTER || 
+                    token.Type == TokenTypes.CREATE ||
+                    token.Type == TokenTypes.GRANT)
+                    return false;
             }
             return false;
         }
@@ -69,9 +65,9 @@ namespace SqlTools.Common
             string objectName = "";
             if (MatchObjectName(ref objectName))
             {
-                if (SearchToken(TokenTypes.AS))
+                if (SeekToken(TokenTypes.AS))
                 {
-                    if (SearchToken(TokenTypes.GO))
+                    if (SeekToken(TokenTypes.GO))
                     {
                         return true;
                     }
@@ -188,13 +184,13 @@ namespace SqlTools.Common
             return false;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        private void PushComment()
-        {
-
-        }
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        //private void PushComment(Token token)
+        //{
+        //    comments.Add(token)
+        //}
 
         /// <summary>
         /// Выражение
@@ -217,7 +213,8 @@ namespace SqlTools.Common
                         MatchGrantPermission();
                         break;
                     case TokenTypes.COMMENT:
-                        PushComment();
+                        comments.Add(token);
+                        //PushComment(token);
                         break;
                     //case TokenTypes.USE:
                     //case TokenTypes.EXEC:
@@ -228,6 +225,10 @@ namespace SqlTools.Common
                     default:
                         StatementBase();
                         break;
+                }
+                if (token.Type != TokenTypes.COMMENT)
+                {
+                    comments.Clear();
                 }
                 return true;
             }
