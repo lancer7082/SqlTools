@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Collections.Generic;
+using System.IO;
 
 namespace SqlTools.Common
 {
@@ -10,16 +11,19 @@ namespace SqlTools.Common
         //private Token currentToken;
         private List<Token> comments;
         
-        public List<string> Objects { get; set; }
+        public List<ScriptObject> Objects { get; set; }
 
         public SqlParser(string text)
         {
-            lexer = new SqlLexer(text);
+            var ms = new MemoryStream(Encoding.ASCII.GetBytes(text));
+            lexer = new SqlLexer(ms);
             comments = new List<Token>();
+            Objects = new List<ScriptObject>();
         }
 
         public void Parse()
         {
+            if (lexer.Eof()) lexer.Reset();
             StatementsList();
         }
 
@@ -28,11 +32,34 @@ namespace SqlTools.Common
         /// </summary>
         private bool StatementBase()
         {
-            if (SeekToken(TokenTypes.GO))
+            if (SeekEndOfBatch())
             {
                 return true;
             }
             return false;
+        }
+
+        /// <summary>
+        /// ALTER | CREATE | DROP
+        /// </summary>
+        /// <returns></returns>
+        private bool IsDDLInstruction(TokenTypes type)
+        {
+            return (
+                type == TokenTypes.ALTER ||
+                type == TokenTypes.CREATE ||
+                type == TokenTypes.DROP);
+        }
+
+        /// <summary>
+        /// GRANT | REVOKE
+        /// </summary>
+        /// <returns></returns>
+        private bool IsDCLInstruction(TokenTypes type)
+        {
+            return (
+                type == TokenTypes.GRANT ||
+                type == TokenTypes.REVOKE);
         }
 
         /// <summary>
@@ -45,29 +72,51 @@ namespace SqlTools.Common
             Token token;
             while ((token = lexer.Next()) != null)
             {
- 
                 if (token.Type == type)
+                {
                     return true;
-                else if (token.Type == TokenTypes.ALTER || 
-                    token.Type == TokenTypes.CREATE ||
-                    token.Type == TokenTypes.GRANT)
+                }
+                else if (IsDDLInstruction(token.Type))
+                {
                     return false;
+                }
             }
             return false;
+        }
+
+        /// <summary>
+        /// Поиск завершения инструкции 
+        /// </summary>
+        /// <returns></returns>
+        private bool SeekEndOfBatch()
+        {
+            Token token;
+            while ((token = lexer.Next()) != null)
+            {
+                if (token.Type == TokenTypes.GO)
+                {
+                    return true;
+                }
+                else if (IsDDLInstruction(token.Type))
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         /// <summary>
         /// Разбор процедуры
         /// </summary>
         /// <returns></returns>
-        private bool MatchProcedure()
+        private bool MatchProcedure(ref string objectName)
         {
-            string objectName = "";
+            //string objectName = "";
             if (MatchObjectName(ref objectName))
             {
                 if (SeekToken(TokenTypes.AS))
                 {
-                    if (SeekToken(TokenTypes.GO))
+                    if (SeekEndOfBatch())
                     {
                         return true;
                     }
@@ -80,9 +129,9 @@ namespace SqlTools.Common
         /// Разбор функции
         /// </summary>
         /// <returns></returns>
-        private bool MatchFunction()
+        private bool MatchFunction(ref string objectName)
         {
-            string objectName = "";
+            //string objectName = "";
             if (MatchObjectName(ref objectName))
             {
                 return true;
@@ -99,7 +148,8 @@ namespace SqlTools.Common
         {
             Token token;
             var sb = new StringBuilder();
-            if ((token = lexer.Next()) != null)
+            token = lexer.LastToken;
+            if (token != null)
             {
                 if (token.Type == TokenTypes.SQUARE_BRACE_OPEN)
                 {
@@ -140,6 +190,7 @@ namespace SqlTools.Common
                     objectName = name;
                     if (((token = lexer.LookAhead()) != null) && (token.Type == TokenTypes.DOT))
                     {
+                        objectName += token.Value;
                         token = lexer.Next();
                         if (MatchDatabaseIdentifier(ref name))
                         {
@@ -154,23 +205,35 @@ namespace SqlTools.Common
             return false;
         }
 
+        //private long GetCurrentPosition
+
         /// <summary>
         /// ALTER | EXEC OBJECT (PROCEDURE | FUNCTION)
         /// </summary>
         private bool StatementAlterCreate()
         {
             Token token;
+            string objectName = "";
+
+            var lastToken = lexer.LastToken;
+
             if ((token = lexer.Next()) != null)
             {
                 if (token.Type == TokenTypes.PROCEDURE)
                 {
-                    if (MatchProcedure())
+                    if (MatchProcedure(ref objectName))
+                    {
+                        Objects.Add(new ScriptObject { Name = objectName, PosStart = lastToken.Position, PosEnd = lexer.CurrentPosition });
                         return true;
+                    }
                 }
                 else if (token.Type == TokenTypes.FUNCTION)
                 {
-                    if (MatchFunction())
+                    if (MatchFunction(ref objectName))
+                    {
+                        Objects.Add(new ScriptObject { Name = objectName, PosStart = token.Position, PosEnd = lexer.CurrentPosition });
                         return true;
+                    }
                 }
             }
             return false;
@@ -179,7 +242,7 @@ namespace SqlTools.Common
         /// <summary>
         /// GRANT Permission ON Object TO Principal
         /// </summary>
-        private bool MatchGrantPermission()
+        private bool MatchGrantRevoke()
         {
             return false;
         }
@@ -210,7 +273,8 @@ namespace SqlTools.Common
                         StatementAlterCreate();
                         break;
                     case TokenTypes.GRANT:
-                        MatchGrantPermission();
+                    case TokenTypes.REVOKE:
+                        MatchGrantRevoke();
                         break;
                     case TokenTypes.COMMENT:
                         comments.Add(token);

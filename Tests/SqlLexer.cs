@@ -6,14 +6,24 @@ namespace SqlTools.Common
 {
     public class SqlLexer
     {
-        private readonly string text;
+        //private readonly string text;
         //private StringReader reader;
-        private StreamReader reader;
+        private CustomStreamReader reader;
 
-        public SqlLexer(string text)
+        /// <summary>
+        /// Текущая позиция
+        /// </summary>
+        public long CurrentPosition { get { return reader != null ? reader.Position : 0; } }
+
+        /// <summary>
+        /// Последний токен
+        /// </summary>
+        public Token LastToken { get; set; }
+
+        public SqlLexer(MemoryStream ms)
         {
-            this.text = text;
-            reader = new StreamReader(new MemoryStream(Encoding.ASCII.GetBytes(text)));
+            //this.text = text;
+            reader = new CustomStreamReader(ms);
         }    
         
         /// <summary>
@@ -59,6 +69,7 @@ namespace SqlTools.Common
             if (reader.Peek() != -1 && (char)reader.Peek() == '/')
             {
                 var c = (char)reader.Read();
+                var pos = reader.Position;
                 if (reader.Peek() != -1)
                 {
                     if ((char)reader.Peek() == '*')   // /*
@@ -74,7 +85,7 @@ namespace SqlTools.Common
                                 if ((char)reader.Peek() == '/')
                                 {
                                     reader.Read();
-                                    return new Token { Type = TokenTypes.COMMENT, Value = sb.ToString() };
+                                    return new Token { Type = TokenTypes.COMMENT, Value = sb.ToString(), Position = pos };
                                 }
                             }
                             sb.Append((char)reader.Read());
@@ -99,6 +110,7 @@ namespace SqlTools.Common
             if (reader.Peek() != -1 && (char)reader.Peek() == '-')
             {
                 var c = (char)reader.Read();
+                var pos = reader.Position;
                 if (reader.Peek() != -1)
                 {
                     if ((char)reader.Peek() == '-')   // --
@@ -110,7 +122,7 @@ namespace SqlTools.Common
                         {
                             if ((char)reader.Peek() == '\r')
                             {
-                                return new Token { Type = TokenTypes.COMMENT, Value = sb.ToString() };
+                                return new Token { Type = TokenTypes.COMMENT, Value = sb.ToString(), Position = pos };
                             }
                             sb.Append((char)reader.Read());
                         }
@@ -127,11 +139,19 @@ namespace SqlTools.Common
 
         public Token Next()
         {
+            var token = ReadNextToken();
+            LastToken = token;
+            return token;
+        }
+
+        private Token ReadNextToken()
+        {
             PassWhiteSpace();
             if (reader.Peek() != -1)
             {
                 //Token token;
                 var c = (char)reader.Peek();
+                var pos = reader.Position;
                 switch (c)
                 {
                     case '(':
@@ -179,9 +199,9 @@ namespace SqlTools.Common
                                 case "END":
                                     return new Token { Type = TokenTypes.END };
                                 case "CREATE":
-                                    return new Token { Type = TokenTypes.CREATE };
+                                    return new Token { Type = TokenTypes.CREATE, Position = pos };
                                 case "ALTER":
-                                    return new Token { Type = TokenTypes.ALTER };
+                                    return new Token { Type = TokenTypes.ALTER, Position = pos };
                                 case "PROCEDURE":
                                     return new Token { Type = TokenTypes.PROCEDURE };
                                 case "FUNCTION":
@@ -212,10 +232,21 @@ namespace SqlTools.Common
 
         public Token LookAhead()
         {
-            var pos = reader.BaseStream.Position;
+            var pos = reader.Position;
             var token = Next();
-            reader.BaseStream.Seek(pos, SeekOrigin.Begin);
+            reader.Seek(pos);
             return token;
+        }
+
+        public void Reset()
+        {
+            if (reader != null)
+                reader.Seek(0);
+        }
+
+        public bool Eof()
+        {
+            return (reader != null ? reader.EndOfStream : true);
         }
     }
 }

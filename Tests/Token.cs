@@ -18,11 +18,13 @@ namespace SqlTools.Common
         END,                    
         CREATE,
         ALTER,
+        DROP,
         PROCEDURE,
         FUNCTION,
         AS,
         EXEC,
         GRANT,
+        REVOKE,
         ON,
         TO,
         //
@@ -33,14 +35,26 @@ namespace SqlTools.Common
         STRING,
         COMMENT
     }
+
     public class Token
     {
         public string Value { get; set; }
 
         public TokenTypes Type { get; set; }
 
+        public long Position { get; set; }
+
         public Token()
         {
         }
+    }
+
+    public class ScriptObject
+    {
+        public string Name { get; set; }
+
+        public long PosStart { get; set; }
+
+        public long PosEnd { get; set; }
     }
 }

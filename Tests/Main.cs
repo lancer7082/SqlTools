@@ -109,13 +109,13 @@ sdsd
 USE asdas
 -- adasd
 GO";
-            var lexer = new SqlLexer(text);
-            Token token;
-            //bool isValid = false;
-            while ((token = lexer.Next()) != null)
-            {
-                Console.WriteLine(token.Type.ToString());
-            };
+            //var lexer = new SqlLexer(text);
+            //Token token;
+            ////bool isValid = false;
+            //while ((token = lexer.Next()) != null)
+            //{
+            //    Console.WriteLine(token.Type.ToString());
+            //};
         }
 
         [TestMethod]
@@ -126,13 +126,13 @@ GO";
 USING asdasd ON dsad
 WHEN MATCHED THEN adsad
 ;";
-            var lexer = new SqlLexer(text);
-            Token token;
-            //bool isValid = false;
-            while ((token = lexer.Next()) != null)
-            {
-                Console.WriteLine(token.Type.ToString());
-            };
+            //var lexer = new SqlLexer(text);
+            //Token token;
+            ////bool isValid = false;
+            //while ((token = lexer.Next()) != null)
+            //{
+            //    Console.WriteLine(token.Type.ToString());
+            //};
         }
     }
 }
