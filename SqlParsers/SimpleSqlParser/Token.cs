@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace SqlTools.Common
+﻿namespace SqlTools.SimpleSqlParser
 {
     public enum TokenTypes {
         //Symbols

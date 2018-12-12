@@ -1,9 +1,8 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using System.Collections.Generic;
 using System.IO;
 
-namespace SqlTools.Common
+namespace SqlTools.SimpleSqlParser
 {
     public class SqlParser
     {

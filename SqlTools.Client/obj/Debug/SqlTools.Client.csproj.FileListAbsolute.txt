@@ -1,0 +1,9 @@
+D:\Home\Projects\dotNet\SqlTools\Bin\Debug\SqlTools.Client.exe.config
+D:\Home\Projects\dotNet\SqlTools\Bin\Debug\SqlTools.Client.exe
+D:\Home\Projects\dotNet\SqlTools\Bin\Debug\SqlTools.Client.pdb
+D:\Home\Projects\dotNet\SqlTools\SqlTools.Client\obj\Debug\SqlTools.Client.csprojAssemblyReference.cache
+D:\Home\Projects\dotNet\SqlTools\SqlTools.Client\obj\Debug\SqlTools.Client.Properties.Resources.resources
+D:\Home\Projects\dotNet\SqlTools\SqlTools.Client\obj\Debug\SqlTools.Client.csproj.GenerateResource.cache
+D:\Home\Projects\dotNet\SqlTools\SqlTools.Client\obj\Debug\SqlTools.Client.csproj.CoreCompileInputs.cache
+D:\Home\Projects\dotNet\SqlTools\SqlTools.Client\obj\Debug\SqlTools.Client.exe
+D:\Home\Projects\dotNet\SqlTools\SqlTools.Client\obj\Debug\SqlTools.Client.pdb

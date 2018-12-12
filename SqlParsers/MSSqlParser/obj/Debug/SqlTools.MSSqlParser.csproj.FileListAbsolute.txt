@@ -1,0 +1,6 @@
+D:\Home\Projects\dotNet\SqlTools\SqlParsers\MSSqlParser\obj\Debug\SqlTools.MSSqlParser.csproj.CoreCompileInputs.cache
+D:\Home\Projects\dotNet\SqlTools\SqlParsers\MSSqlParser\obj\Debug\SqlTools.MSSqlParser.csproj.CopyComplete
+D:\Home\Projects\dotNet\SqlTools\Bin\Debug\SqlTools.MSSqlParser.dll
+D:\Home\Projects\dotNet\SqlTools\Bin\Debug\SqlTools.MSSqlParser.pdb
+D:\Home\Projects\dotNet\SqlTools\SqlParsers\MSSqlParser\obj\Debug\SqlTools.MSSqlParser.dll
+D:\Home\Projects\dotNet\SqlTools\SqlParsers\MSSqlParser\obj\Debug\SqlTools.MSSqlParser.pdb

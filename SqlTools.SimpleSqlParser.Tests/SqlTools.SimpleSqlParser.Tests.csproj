@@ -50,12 +50,14 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="CustomStreamReader.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SqlLexer.cs" />
-    <Compile Include="SqlParser.cs" />
-    <Compile Include="Token.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SqlParsers\SimpleSqlParser\SqlTools.SimpleSqlParser.csproj">
+      <Project>{35a836dc-015c-4dae-a9f5-8aa907fbcd33}</Project>
+      <Name>SqlTools.SimpleSqlParser</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

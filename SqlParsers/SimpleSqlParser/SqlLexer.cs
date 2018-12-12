@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 
-namespace SqlTools.Common
+namespace SqlTools.SimpleSqlParser
 {
     public class SqlLexer
     {
