@@ -1,5 +1,9 @@
-/Tests/bin
-/Tests/obj
-/SqlTools/bin
-/SqlTools/obj
 /packages
+/SqlTools.Client/bin
+/SqlParsers/MSSqlParser/bin
+/SqlParsers/MSSqlParser/obj
+/SqlParsers/SimpleSqlParser/bin
+/SqlParsers/SimpleSqlParser/obj
+/SqlTools.Client/obj
+/SqlTools.SimpleSqlParser.Tests/bin
+/SqlTools.SimpleSqlParser.Tests/obj

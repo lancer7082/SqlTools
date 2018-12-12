@@ -1,9 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlTools", "SqlTools\SqlTools.csproj", "{1F759B27-96A7-4C28-9A19-0B17ED92BE52}"
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2047
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlTools.SimpleSqlParser.Tests", "Tests\SqlTools.SimpleSqlParser.Tests.csproj", "{AAFBF1DA-15DB-4B8D-914A-8AFD94F40945}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{AAFBF1DA-15DB-4B8D-914A-8AFD94F40945}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SqlParsers", "SqlParsers", "{1327A5D0-CD46-419E-ACD0-508CE35BDE80}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{ACB204CB-D9A7-49C4-90A1-C03CCD059845}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlTools.Client", "SqlTools.Client\SqlTools.Client.csproj", "{1F759B27-96A7-4C28-9A19-0B17ED92BE52}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlTools.SimpleSqlParser", "SqlParsers\SimpleSqlParser\SqlTools.SimpleSqlParser.csproj", "{35A836DC-015C-4DAE-A9F5-8AA907FBCD33}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlTools.MSSqlParser", "SqlParsers\MSSqlParser\SqlTools.MSSqlParser.csproj", "{12C24F76-0352-4DC5-872D-158C3C8B0996}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,16 +21,32 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{1F759B27-96A7-4C28-9A19-0B17ED92BE52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1F759B27-96A7-4C28-9A19-0B17ED92BE52}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1F759B27-96A7-4C28-9A19-0B17ED92BE52}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1F759B27-96A7-4C28-9A19-0B17ED92BE52}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AAFBF1DA-15DB-4B8D-914A-8AFD94F40945}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AAFBF1DA-15DB-4B8D-914A-8AFD94F40945}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AAFBF1DA-15DB-4B8D-914A-8AFD94F40945}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AAFBF1DA-15DB-4B8D-914A-8AFD94F40945}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F759B27-96A7-4C28-9A19-0B17ED92BE52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F759B27-96A7-4C28-9A19-0B17ED92BE52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F759B27-96A7-4C28-9A19-0B17ED92BE52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F759B27-96A7-4C28-9A19-0B17ED92BE52}.Release|Any CPU.Build.0 = Release|Any CPU
+		{35A836DC-015C-4DAE-A9F5-8AA907FBCD33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35A836DC-015C-4DAE-A9F5-8AA907FBCD33}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35A836DC-015C-4DAE-A9F5-8AA907FBCD33}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35A836DC-015C-4DAE-A9F5-8AA907FBCD33}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12C24F76-0352-4DC5-872D-158C3C8B0996}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12C24F76-0352-4DC5-872D-158C3C8B0996}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12C24F76-0352-4DC5-872D-158C3C8B0996}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12C24F76-0352-4DC5-872D-158C3C8B0996}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{AAFBF1DA-15DB-4B8D-914A-8AFD94F40945} = {ACB204CB-D9A7-49C4-90A1-C03CCD059845}
+		{35A836DC-015C-4DAE-A9F5-8AA907FBCD33} = {1327A5D0-CD46-419E-ACD0-508CE35BDE80}
+		{12C24F76-0352-4DC5-872D-158C3C8B0996} = {1327A5D0-CD46-419E-ACD0-508CE35BDE80}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {59361330-D3D0-4B2B-B71F-0BCE5182922F}
 	EndGlobalSection
 EndGlobal
